@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notendurchschnitt Rechner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f7f7f7;
+            color: #333;
+        }
+        .container {
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        ul {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Notendurchschnitt Rechner</h2>
+        <p>Zulässige Noten: 1, 1.25, 1.5, 1.75, ..., 6</p>
+        <input type="text" id="noteInput" placeholder="Note eingeben (oder 'ende')" />
+        <button onclick="addNote()">Note hinzufügen</button>
+        <button onclick="calculateAverage()">Durchschnitt berechnen</button>
+
+        <div id="output" class="result"></div>
+        <ul id="notenListe"></ul>
+    </div>
+
+    <script>
+        const noten = [];
+        const allowedNotes = [
+            1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75,
+            3, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75,
+            5, 5.25, 5.5, 5.75, 6
+        ];
+
+        function addNote() {
+            const input = document.getElementById('noteInput');
+            const value = input.value.trim().toLowerCase();
+            const output = document.getElementById('output');
+
+            if (value === 'ende') {
+                output.textContent = "Eingabe beendet.";
+                input.value = '';
+                return;
+            }
+
+            const num = parseFloat(value);
+            if (isNaN(num)) {
+                output.textContent = "Ungültige Eingabe. Bitte eine Zahl eingeben oder 'ende'.";
+            } else if (!allowedNotes.includes(num)) {
+                output.textContent = "Ungültige Note. Nur Werte zwischen 1 und 6 in 0.25-Schritten sind erlaubt.";
+            } else {
+                noten.push(num);
+                output.textContent = `Note ${num} hinzugefügt.`;
+                showNotes();
+            }
+
+            input.value = '';
+        }
+
+        function showNotes() {
+            const list = document.getElementById('notenListe');
+            list.innerHTML = '';
+            noten.forEach(n => {
+                const li = document.createElement('li');
+                li.textContent = n;
+                list.appendChild(li);
+            });
+        }
+
+        function calculateAverage() {
+            const output = document.getElementById('output');
+            if (noten.length === 0) {
+                output.textContent = "Keine Noten eingegeben.";
+                return;
+            }
+
+            const avg = (noten.reduce((a, b) => a + b, 0) / noten.length).toFixed(2);
+            output.textContent = `Dein Notendurchschnitt ist: ${avg}`;
+
+            // Datei-Download vorbereiten
+            let text = "Eingegebene Noten:\n";
+            noten.forEach(n => text += n + "\n");
+            text += `\nNotendurchschnitt: ${avg}\n`;
+
+            const blob = new Blob([text], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "noten_durchschnitt.txt";
+            link.click();
+        }
+    </script>
+</body>
+</html>
+
