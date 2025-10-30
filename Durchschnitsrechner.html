@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Notentabelle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #030303ff;
+    }
+
+    table {
+      width: 70%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #008cff;
+      color: white;
+    }
+
+    select {
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid #aaa;
+    }
+
+    #durchschnitt {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.3em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Notentabelle</h1>
+
+  <table id="notenTabelle">
+    <thead>
+      <tr>
+        <th>Fach</th>
+        <th>Note</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="durchschnitt">Durchschnitt: –</div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const faecher = ["Deutsch", "Französisch", "Mathematik", "RZG", "Englisch", "BG", "WAH"];
+      const tbody = document.querySelector("#notenTabelle tbody");
+
+      // Noten von 1.00 bis 6.00 in 0.25-Schritten
+      const noten = [];
+      for (let i = 1; i <= 6; i += 0.25) {
+        noten.push(i.toFixed(2).replace('.', ','));
+      }
+
+      // Tabelle dynamisch erzeugen
+      faecher.forEach(fach => {
+        const tr = document.createElement("tr");
+
+        const tdFach = document.createElement("td");
+        tdFach.textContent = fach;
+
+        const tdNote = document.createElement("td");
+        const select = document.createElement("select");
+
+        // Leere Option zuerst
+        const leer = document.createElement("option");
+        leer.value = "";
+        leer.textContent = "–";
+        select.appendChild(leer);
+
+        // Noten-Optionen hinzufügen
+        noten.forEach(note => {
+          const option = document.createElement("option");
+          option.value = note.replace(',', '.');
+          option.textContent = note;
+          select.appendChild(option);
+        });
+
+        select.addEventListener("change", berechneDurchschnitt);
+
+        tdNote.appendChild(select);
+        tr.appendChild(tdFach);
+        tr.appendChild(tdNote);
+        tbody.appendChild(tr);
+      });
+
+      // Funktion zur Berechnung des Durchschnitts
+      function berechneDurchschnitt() {
+        const alleSelects = document.querySelectorAll("select");
+        let summe = 0;
+        let count = 0;
+
+        alleSelects.forEach(sel => {
+          const wert = parseFloat(sel.value);
+          console.log(`Fach: ${sel.parentElement.previousSibling.textContent}, Wert:`, wert); // Debug-Ausgabe
+          if (!isNaN(wert)) {
+            summe += wert;
+            count++;
+          }
+        });
+
+        if (count > 0) {
+          const avg = (summe / count).toFixed(2).replace('.', ',');
+          document.getElementById("durchschnitt").textContent = "Durchschnitt: " + avg;
+          console.log("Aktueller Durchschnitt:", avg); // Debug
+        } else {
+          document.getElementById("durchschnitt").textContent = "Durchschnitt: –";
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
+
